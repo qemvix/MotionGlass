@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1-preview.1 — Unreleased performance candidate
+
+- Reuse frame-history and accumulation textures instead of copying four full-resolution textures on every frame.
+- Limit the Direct3D presentation queue to one frame to reduce queued-frame latency.
+- Release desktop-duplication frames immediately before the next acquisition, following Microsoft's guidance to reduce redundant capture updates.
+- Include synthetic moving-image hashes in offscreen test results for regression comparisons.
+
+The candidate's five synthetic moving-image outputs match 1.0.0 byte for byte. Live desktop frame rate and latency have not been measured for this candidate. It still uses desktop capture and an overlay; this change does not provide game-renderer integration.
+
 ## 1.0.0 — 2026-10-23
 
 Initial Windows x64 release.

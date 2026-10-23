@@ -22,9 +22,10 @@ internal sealed class GraphicsPipeline : IDisposable
     private readonly ID3D11PixelShader normalize, flow, blur, copy;
     private readonly ID3D11Buffer constants;
     private readonly ID3D11SamplerState sampler;
-    private readonly Surface raw, current, result;
+    private readonly Surface raw;
+    private Surface current, result;
     private readonly Surface[] history, fields;
-    private readonly Surface accumulated;
+    private Surface accumulated;
     private Surface? pointer;
     private bool initialized;
     private BlurMode lastMode;
@@ -119,6 +120,8 @@ internal sealed class GraphicsPipeline : IDisposable
     }
     internal void Process(Settings settings,float delta,int rotation,Point cursor,Size cursorSize,bool cursorVisible)
     {
+        // Last frame's output becomes history by exchanging ownership, without copying pixels.
+        (result,accumulated)=(accumulated,result);
         parameters.Amount=settings.Amount/100f; parameters.Delta=delta;
         parameters.Scaling=settings.RefreshScaling ? 1:0; parameters.Mode=(int)settings.Mode;
         parameters.Rotation=rotation; parameters.CursorPosition=new(cursor.X,cursor.Y);
@@ -145,10 +148,9 @@ internal sealed class GraphicsPipeline : IDisposable
             views[5]=fields[2].View;
         }
         Draw(result,blur);
-        Context.CopyResource(accumulated.Texture,result.Texture);
-        Context.CopyResource(history[2].Texture,history[1].Texture);
-        Context.CopyResource(history[1].Texture,history[0].Texture);
-        Context.CopyResource(history[0].Texture,current.Texture);
+        // Recycle the oldest input surface for the next frame's normalization pass.
+        var recycled=history[2];
+        history[2]=history[1]; history[1]=history[0]; history[0]=current; current=recycled;
     }
     internal void PresentTo(ID3D11RenderTargetView target)
     {

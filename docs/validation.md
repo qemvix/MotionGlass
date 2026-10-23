@@ -27,3 +27,9 @@ Observed rendering rates were approximately 30 FPS for Velocity, 33 FPS for Hybr
 - The executable is unsigned; no code-signing or installer validation is claimed.
 
 The automated Windows workflow builds and runs the offscreen checks only. Live effect tests should remain explicit and supervised.
+
+## 1.0.1 performance candidate
+
+The texture ownership changes were compared against 1.0.0 using the same synthetic moving-frame sequences and WARP device on the same machine. SHA-256 fingerprints of the final output matched byte for byte in all five modes. Static-image, distinct-mode, and 0% checks also passed.
+
+This establishes image-output equivalence for those sequences. It does not establish improved live FPS, input latency, capture compatibility, or visual behavior under every workload. No live desktop capture or overlay test was run for this candidate.
