@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Security.Cryptography;
 
 namespace MotionGlass;
 
@@ -9,6 +10,7 @@ internal static class SelfTest
         string folder=args.SkipWhile(a=>a!="--self-test").Skip(1).FirstOrDefault() ?? AppContext.BaseDirectory;
         Directory.CreateDirectory(folder);
         var checks=new List<string>();
+        var movingOutputHashes=new Dictionary<string,string>();
         try
         {
             using(var gpu=new GraphicsPipeline(null,128,96,128,96,true))
@@ -35,6 +37,7 @@ internal static class SelfTest
                         gpu.UploadDesktop(moving); gpu.Process(new Settings(mode,65),1f/60,1,Point.Empty,Size.Empty,false);
                     }
                     byte[] output=gpu.ReadResult(); outputs.Add(output);
+                    movingOutputHashes[mode.ToString()]=Convert.ToHexStringLower(SHA256.HashData(output));
                     checks.Add($"PASS: {mode} renders moving content");
                 }
                 for(int i=0;i<outputs.Count;i++) for(int j=i+1;j<outputs.Count;j++)
@@ -56,7 +59,7 @@ internal static class SelfTest
                 checks.Add("PASS: controls enable and disable correctly in every mode");
             }
 #endif
-            File.WriteAllText(Path.Combine(folder,"self-test.json"),JsonSerializer.Serialize(new { passed=true,checks },new JsonSerializerOptions { WriteIndented=true }));
+            File.WriteAllText(Path.Combine(folder,"self-test.json"),JsonSerializer.Serialize(new { passed=true,checks,movingOutputHashes },new JsonSerializerOptions { WriteIndented=true }));
             Environment.ExitCode=0;
         }
         catch(Exception ex)

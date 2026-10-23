@@ -6,7 +6,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $projectPath = Join-Path $repoRoot 'src/MotionGlass/MotionGlass.csproj'
 [xml]$project = Get-Content -LiteralPath $projectPath
 $version = [string]$project.Project.PropertyGroup.Version
-if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Expected a three-part release version.' }
+if ($version -notmatch '^\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$') { throw 'Expected a release or prerelease version.' }
 $outputFolder = Join-Path $repoRoot "artifacts/release/v$version"
 $publishFolder = Join-Path $repoRoot 'artifacts/publish/win-x64'
 $bundleFolder = Join-Path $outputFolder 'portable'

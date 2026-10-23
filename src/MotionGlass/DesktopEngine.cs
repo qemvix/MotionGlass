@@ -163,6 +163,8 @@ internal sealed class DesktopEngine : IDisposable
             bool rotated=rotation is 2 or 4;
             using var graphics=new GraphicsPipeline(selectedAdapter,bounds.Width,bounds.Height,
                 rotated?bounds.Height:bounds.Width,rotated?bounds.Width:bounds.Height);
+            using var pacing=graphics.Device.QueryInterface<IDXGIDevice1>();
+            pacing.MaximumFrameLatency=1;
             using var duplication=output1.DuplicateOutput(graphics.Device);
             var swapDescription=new SwapChainDescription1
             {
@@ -180,7 +182,7 @@ internal sealed class DesktopEngine : IDisposable
             using var back=swap.GetBuffer<ID3D11Texture2D>(0);
             using var backView=graphics.Device.CreateRenderTargetView(back);
             var cursor=new CursorImage();
-            bool hasDesktop=false,separatePointer=true,shown=false;
+            bool hasDesktop=false,separatePointer=true,shown=false,frameHeld=false;
             long previous=Stopwatch.GetTimestamp(),second=previous;
             int count=0;
             Error=null;
@@ -189,16 +191,20 @@ internal sealed class DesktopEngine : IDisposable
                 while(!Stop.IsSet && owner.Enabled && owner.Settings.HasEffect)
                 {
                     long start=Stopwatch.GetTimestamp();
+                    // Keep ownership while processing so DXGI can coalesce intervening updates.
+                    // Release immediately before acquiring, as recommended by the duplication API.
+                    if(frameHeld) { frameHeld=false; duplication.ReleaseFrame().CheckError(); }
                     var acquire=duplication.AcquireNextFrame(0,out var info,out var desktop);
                     if(acquire.Success)
                     {
+                        frameHeld=true;
                         try
                         {
                             using var texture=desktop.QueryInterface<ID3D11Texture2D>();
                             graphics.CopyDesktop(texture); hasDesktop=true;
                             if(info.LastMouseUpdateTime!=0) separatePointer=info.PointerPosition.Visible;
                         }
-                        finally { desktop.Dispose(); duplication.ReleaseFrame().CheckError(); }
+                        finally { desktop.Dispose(); }
                     }
                     else if(acquire!=Vortice.DXGI.ResultCode.WaitTimeout) acquire.CheckError();
                     if(!hasDesktop) { Stop.Wait(4); continue; }
@@ -214,7 +220,11 @@ internal sealed class DesktopEngine : IDisposable
                     if(Stopwatch.GetElapsedTime(second).TotalSeconds>=1) { Fps=count; count=0; second=Stopwatch.GetTimestamp(); }
                 }
             }
-            finally { Fps=0; owner.SetVisible(this,false); }
+            finally
+            {
+                if(frameHeld) duplication.ReleaseFrame();
+                Fps=0; owner.SetVisible(this,false);
+            }
         }
     }
 }
