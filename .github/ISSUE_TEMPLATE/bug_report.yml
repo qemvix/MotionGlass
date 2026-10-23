@@ -1,0 +1,43 @@
+name: Bug report
+description: Report a problem with an official MotionGlass release.
+title: "[Bug] "
+body:
+  - type: input
+    id: version
+    attributes:
+      label: MotionGlass version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: textarea
+    id: system
+    attributes:
+      label: Windows and displays
+      description: Include Windows version, GPU, display count, resolutions, refresh rates, and whether HDR is active.
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Blur mode
+      options:
+        - Velocity based
+        - Frame blending
+        - Hybrid blending
+        - Accumulation max
+        - Accumulation mix
+        - Startup / controls / other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps and behavior
+      description: Explain how to reproduce the issue, what you expected, and what happened. Include amount, scaling, and the status text when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: off
+    attributes:
+      label: Does turning blur off resolve it?
+      description: Use the power switch, Ctrl + Alt + Esc, or the tray menu. Remove personal information from any screenshots.

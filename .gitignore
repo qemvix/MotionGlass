@@ -1,0 +1,28 @@
+# Build and packaging output
+**/bin/
+**/obj/
+artifacts/
+publish/
+test-results/
+*.exe
+*.zip
+
+# Local IDE and user settings
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local secrets and temporary files
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+*.log
+*.tmp
+Thumbs.db
+.DS_Store

@@ -1,0 +1,61 @@
+name: Windows build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test-package:
+    name: Build, offscreen checks, and portable package
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - name: Restore locked dependencies
+        run: dotnet restore MotionGlass.slnx --locked-mode
+      - name: Build
+        run: dotnet build MotionGlass.slnx -c Release --no-restore --nologo -warnaserror
+      - name: Run offscreen shader checks
+        run: ./scripts/Test.ps1 -NoBuild
+      - name: Package and verify the portable app
+        run: ./scripts/Package.ps1
+      - name: Upload Windows package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: MotionGlass-win-x64
+          path: |
+            artifacts/release/v*/MotionGlass.exe
+            artifacts/release/v*/MotionGlass-v*-win-x64.zip
+            artifacts/release/v*/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload check results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: offscreen-check-results
+          path: |
+            artifacts/tests/**/self-test.json
+            artifacts/package-tests/**/self-test.json
+          if-no-files-found: ignore
+          retention-days: 14

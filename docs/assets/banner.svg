@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="350" viewBox="0 0 1280 350" role="img" aria-labelledby="title desc">
+  <title id="title">MotionGlass</title>
+  <desc id="desc">Motion across your desktop. A Windows desktop motion blur app.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#11121b"/><stop offset="1" stop-color="#201b34"/></linearGradient>
+    <linearGradient id="stroke"><stop stop-color="#a68bfa" stop-opacity=".05"/><stop offset="1" stop-color="#c8b6ff"/></linearGradient>
+  </defs>
+  <rect width="1280" height="350" rx="28" fill="url(#bg)"/>
+  <g fill="none" stroke="url(#stroke)" stroke-width="16" stroke-linecap="round">
+    <path d="M72 182 160 94"/><path d="M72 229 204 97"/><path d="M119 229 207 141"/>
+  </g>
+  <text x="265" y="164" fill="#f0f0f7" font-family="Segoe UI,Arial,sans-serif" font-size="66" font-weight="700" letter-spacing="-2">MotionGlass</text>
+  <text x="269" y="214" fill="#a9a7c1" font-family="Segoe UI,Arial,sans-serif" font-size="25">Motion across your desktop.</text>
+  <g stroke="#a68bfa" fill="none" stroke-width="2" opacity=".22">
+    <rect x="903" y="87" width="198" height="151" rx="14"/><rect x="931" y="87" width="198" height="151" rx="14"/><rect x="959" y="87" width="198" height="151" rx="14"/>
+  </g>
+  <rect x="987" y="87" width="198" height="151" rx="14" fill="#29233e" stroke="#b69bff" stroke-width="2"/>
+  <path d="M1008 113h155" stroke="#b69bff" opacity=".6" stroke-width="2"/>
+  <circle cx="1143" cy="103" r="2" fill="#b69bff"/><circle cx="1153" cy="103" r="2" fill="#b69bff"/>
+  <text x="269" y="274" fill="#b9a4f9" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="3">WINDOWS · FIVE MODES · PORTABLE</text>
+</svg>

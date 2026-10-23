@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Usage and troubleshooting
+    url: https://github.com/qemvix/MotionGlass/blob/main/docs/troubleshooting.md
+    about: Check the documented control rules and known limitations first.
